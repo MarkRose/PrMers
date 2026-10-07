@@ -5038,7 +5038,7 @@ Pm1Stage2Result App::runPM1Stage2Marin() {
             std::cerr << "\n[BSGS] INTERNAL ERROR: residue not found for prime r=" << r
                       << " (e=" << e << ", D=" << D << ")\n";
             delete eng;
-            return -3;
+            return Pm1Stage2Result::Error;
         }
 
         const size_t babyReg = babyBase + (size_t)bi;
