@@ -1,3 +1,40 @@
+## v0.3.98 NVIDIA PFA7 GF61 middle-out normalization
+
+- NVIDIA PFA7 GF61 middle-out now folds the inverse-radix normalization
+  into the left operand of the single shared middle twiddle before `cmul`,
+  replacing seven per-output scalar normalizations with one prescale.
+- Scope is restricted to NVIDIA, PFA7 and GF61 middle-out. The existing
+  NVIDIA PFA9 middle-out normalization optimization remains unchanged, and
+  Radeon compilation remains byte-identical to the previous stock path.
+- PrMers fixed-plan validation: central 12-pair full-PRP geomean +0.0213%
+  with 10/12 wins; low/high range aggregate +0.0255% with 10/12 wins.
+- RTX JIT resources improved from 72 to 70 registers and from 1381 to 1225
+  PTX instructions, with zero local-memory spill and unchanged 7-block/SM
+  occupancy.
+- Standalone Aevum validation passed host/API/CLI gates on RTX and API gates
+  on Radeon VII; PFA7 exact 10000 and PFA9 regression exact 5000 passed on
+  both GPUs.
+- The exact source-only candidate passed the standalone preflight CI matrix
+  on Linux, Windows and macOS (11/11 jobs) before fast-forward promotion to
+  main. The promoted source SHA then passed the same main CI matrix.
+
+## v0.3.97 NVIDIA PFA9 GF61 middle-out normalization
+
+- NVIDIA PFA9 GF61 middle-out now folds the inverse-radix normalization into
+  the single shared middle twiddle instead of applying nine per-output scalar
+  normalizations.
+- Scope is deliberately restricted to NVIDIA, PFA9 and GF61 middle-out.
+  PFA3 and PFA7 retain their previous arithmetic, and Radeon compilation
+  retains the stock path.
+- PrMers validation: central fixed-plan confirmation 20/20 wins at about
+  +0.059%, range validation 12/12 wins at about +0.058%.
+- RTX JIT resources improved from 70 to 66 registers and from 1498 to 1290
+  PTX instructions, with zero local-memory spill and unchanged 7-block/SM
+  occupancy.
+- Standalone Aevum validation passed host/API gates on RTX and Radeon,
+  PFA9 exact 10000 on both GPUs, PFA7 stock-path exact 5000 on both GPUs,
+  and standalone RTX PFA9 confirmation 4/4 positive.
+
 ## Word-exact three-plane FFT323161 PFA9
 
 - The FP32 plane of the `pfa9full:4:...` / non-elided `pfa9:4:...` plan now
