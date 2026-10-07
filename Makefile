@@ -155,6 +155,10 @@ test-marin-ibdwt-bound:
 test-worktodo-manager:
 	bash tests/test_worktodo_manager.sh
 
+.PHONY: test-gaussian-tf-preparser
+test-gaussian-tf-preparser:
+	bash tests/test_gaussian_tf_preparser.sh
+
 test-marin-ll-radix5: all
 	bash tests/run_marin_ll_radix5_regression.sh $${AEVUM_TEST_DEVICE:-0}
 
