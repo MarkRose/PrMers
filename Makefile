@@ -164,6 +164,10 @@ test-proof-power:
 test-proof-verify:
 	python3 tests/proof_verify_result_source_test.py
 
+.PHONY: test-worktodo-small-items
+test-worktodo-small-items:
+	bash tests/test_worktodo_small_items.sh
+
 test-marin-invalid-device:
 	mkdir -p tests/build-marin-invalid-device
 	$(CXX) -std=c++20 -O2 -Wall -Wextra -Iinclude -Iinclude/marin -DGPU tests/marin_invalid_device_test.cpp -o tests/build-marin-invalid-device/marin-invalid-device-test -lOpenCL
