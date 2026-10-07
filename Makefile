@@ -437,3 +437,10 @@ test-gm-ecm-resume:
 	mkdir -p /tmp/prmers-gm-ecm-resume-test
 	g++ -std=c++20 -Wall -Wextra -Iinclude tests/gm_ecm_progress_test.cpp -o /tmp/prmers-gm-ecm-resume-test/gm_ecm_progress_test
 	/tmp/prmers-gm-ecm-resume-test/gm_ecm_progress_test
+
+.PHONY: test-gm-chain-resume
+test-gm-chain-resume:
+	python3 tests/gm_chain_resume_source_test.py
+	mkdir -p /tmp/prmers-gm-chain-resume-test
+	g++ -std=c++20 -Wall -Wextra -Iinclude tests/gm_chain_progress_test.cpp -o /tmp/prmers-gm-chain-resume-test/gm_chain_progress_test
+	/tmp/prmers-gm-chain-resume-test/gm_chain_progress_test
