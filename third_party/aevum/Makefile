@@ -190,30 +190,26 @@ STATE_TEST := build-tests/aevum-state-compact-test
 OPENCL_STANDARD_TEST := build-tests/aevum-opencl-standard-test
 MONOLITHIC_SOURCE_TEST := build-tests/aevum-opencl-monolithic-source-test
 TYPE4_PLAN_TEST := build-tests/aevum-type4-pfa9-plan-test
-FFT_SIZE_ONLY_SPEC_TEST := build-tests/aevum-fft-size-only-spec-test
-FFT_CARRY32_GATE_TEST := build-tests/aevum-fft-carry32-gate-test
-FFT_SPEC_ROBUSTNESS_TEST := build-tests/aevum-fft-spec-robustness-test
-ARGS_VALUE_FOR_TEST := build-tests/aevum-args-value-for-test
-TRIG_CACHE_KEY_TEST := build-tests/aevum-trig-cache-key-test
 FFT_EXPLICIT_CAPACITY_TEST := build-tests/aevum-fft-explicit-capacity-test
+TRIG_CACHE_KEY_TEST := build-tests/aevum-trig-cache-key-test
+ARGS_VALUE_FOR_TEST := build-tests/aevum-args-value-for-test
+FFT_SPEC_ROBUSTNESS_TEST := build-tests/aevum-fft-spec-robustness-test
+FFT_CARRY32_GATE_TEST := build-tests/aevum-fft-carry32-gate-test
+FFT_SIZE_ONLY_SPEC_TEST := build-tests/aevum-fft-size-only-spec-test
 EVENT_STATUS_TEST := build-tests/aevum-event-status-test
 FFT8_SKIP1_TEST := build-tests/aevum-fft8-skip1-test
+WMUL_LIMIT_TEST := build-tests/aevum-wmul-limit-test
+GF61_LIMB32_CMUL_TEST := build-tests/aevum-gf61-limb32-cmul-test
+RADIX1K_POLICY_TEST := build-tests/aevum-radix1k-policy-test
+RADIX1K_POLICY_APPLE_TEST := build-tests/aevum-radix1k-policy-apple-test
+APPLE_TAILZERO_TEST := build-tests/aevum-apple-tailzero-halfline-test
+APPLE_FFTP61_SEED_TEST := build-tests/aevum-apple-fftp61-seed-test
+STATS_SLOT_TEST := build-tests/aevum-stats-slot-test
+SHUFL_PERMUTATION_TEST := build-tests/aevum-shufl-permutation-test
 FFT_VARIANT0_1K_TEST := build-tests/aevum-fft-variant0-1k-test
 AUTOTUNE_CACHE_TEST := build-tests/aevum-runtime-autotune-cache-test
 
-.PHONY: test test-host test-fft-variant0-1k test-gpu test-pfa9-lead-bridge-gpu
-SHUFL_PERMUTATION_TEST := build-tests/aevum-shufl-permutation-test
-AUTOTUNE_CACHE_TEST := build-tests/aevum-runtime-autotune-cache-test
-
-.PHONY: test test-host test-shufl-permutation test-gpu test-pfa9-lead-bridge-gpu
-STATS_SLOT_TEST := build-tests/aevum-stats-slot-test
-AUTOTUNE_CACHE_TEST := build-tests/aevum-runtime-autotune-cache-test
-
-.PHONY: test test-host test-stats-slot test-gpu test-pfa9-lead-bridge-gpu
-APPLE_FFTP61_SEED_TEST := build-tests/aevum-apple-fftp61-seed-test
-AUTOTUNE_CACHE_TEST := build-tests/aevum-runtime-autotune-cache-test
-
-.PHONY: test test-host test-apple-fftp61-seed test-gpu test-pfa9-lead-bridge-gpu
+.PHONY: test test-host test-gpu test-pfa9-lead-bridge-gpu test-fft-variant0-1k test-shufl-permutation test-stats-slot test-apple-fftp61-seed test-apple-tailzero-halfline test-radix1k-policy test-gf61-limb32-cmul
 
 test: test-host
 
@@ -221,7 +217,7 @@ $(MONOLITHIC_SOURCE_TEST): tests/opencl_monolithic_source_test.cpp src/OpenCLSou
 	@mkdir -p build-tests
 	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra tests/opencl_monolithic_source_test.cpp src/OpenCLSourceBuilder.cpp -o $@
 
-test-host: $(MONOLITHIC_SOURCE_TEST) $(HOST_TEST) $(STATE_TEST) $(OPENCL_STANDARD_TEST) $(TYPE4_PLAN_TEST) $(FFT_SIZE_ONLY_SPEC_TEST) $(AUTOTUNE_CACHE_TEST) $(EVENT_STATUS_TEST) $(FFT8_SKIP1_TEST) $(FFT_CARRY32_GATE_TEST) $(FFT_SPEC_ROBUSTNESS_TEST) $(ARGS_VALUE_FOR_TEST) $(TRIG_CACHE_KEY_TEST) $(FFT_EXPLICIT_CAPACITY_TEST) $(FFT_VARIANT0_1K_TEST) $(SHUFL_PERMUTATION_TEST) $(STATS_SLOT_TEST)
+test-host: $(MONOLITHIC_SOURCE_TEST) $(HOST_TEST) $(STATE_TEST) $(OPENCL_STANDARD_TEST) $(TYPE4_PLAN_TEST) $(AUTOTUNE_CACHE_TEST) $(EVENT_STATUS_TEST) $(FFT8_SKIP1_TEST) $(FFT_SIZE_ONLY_SPEC_TEST) $(FFT_CARRY32_GATE_TEST) $(FFT_SPEC_ROBUSTNESS_TEST) $(ARGS_VALUE_FOR_TEST) $(TRIG_CACHE_KEY_TEST) $(FFT_EXPLICIT_CAPACITY_TEST) $(FFT_VARIANT0_1K_TEST) $(SHUFL_PERMUTATION_TEST) $(STATS_SLOT_TEST) $(APPLE_TAILZERO_TEST) $(RADIX1K_POLICY_TEST) $(RADIX1K_POLICY_APPLE_TEST) $(GF61_LIMB32_CMUL_TEST) $(WMUL_LIMIT_TEST)
 	$(MONOLITHIC_SOURCE_TEST)
 	bash tests/opencl12_syntax_test.sh
 	bash tests/pow2_type4_opencl_syntax.sh
@@ -254,24 +250,32 @@ test-host: $(MONOLITHIC_SOURCE_TEST) $(HOST_TEST) $(STATE_TEST) $(OPENCL_STANDAR
 	python3 tests/engine_lead_cache_test.py
 	python3 tests/tail_kernels_range_source_test.py
 	python3 tests/native_tune_compat_source_test.py
-	python3 tests/asm_string_braces_test.py
+	python3 tests/kernel_inline_linkage_test.py
 	python3 tests/kernel_config_guards_test.py
 	python3 tests/carryfused_weight_shift_modulus_test.py
 	python3 tests/carry_gf61_seed_overflow_test.py
 	python3 tests/prp_middle1_type_gate_test.py
+	python3 tests/asm_string_braces_test.py
 	$(HOST_TEST)
 	$(STATE_TEST)
 	$(OPENCL_STANDARD_TEST)
 	$(TYPE4_PLAN_TEST)
-	$(FFT_SIZE_ONLY_SPEC_TEST)
-	$(FFT_CARRY32_GATE_TEST)
-	$(FFT_SPEC_ROBUSTNESS_TEST)
-	$(ARGS_VALUE_FOR_TEST)
-	$(TRIG_CACHE_KEY_TEST)
 	$(FFT_EXPLICIT_CAPACITY_TEST)
+	$(TRIG_CACHE_KEY_TEST)
+	$(ARGS_VALUE_FOR_TEST)
+	$(FFT_SPEC_ROBUSTNESS_TEST)
+	$(FFT_CARRY32_GATE_TEST)
+	$(FFT_SIZE_ONLY_SPEC_TEST)
 	$(AUTOTUNE_CACHE_TEST)
 	$(EVENT_STATUS_TEST)
 	$(FFT8_SKIP1_TEST)
+	$(WMUL_LIMIT_TEST)
+	$(GF61_LIMB32_CMUL_TEST)
+	$(RADIX1K_POLICY_TEST)
+	$(RADIX1K_POLICY_APPLE_TEST)
+	$(APPLE_TAILZERO_TEST)
+	$(STATS_SLOT_TEST)
+	$(SHUFL_PERMUTATION_TEST)
 	$(FFT_VARIANT0_1K_TEST)
 
 $(FFT_VARIANT0_1K_TEST): tests/fft_variant0_1k_test.cpp src/clwrap.cpp src/Trig.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(wildcard src/cl/*.cl)
@@ -280,7 +284,6 @@ $(FFT_VARIANT0_1K_TEST): tests/fft_variant0_1k_test.cpp src/clwrap.cpp src/Trig.
 
 test-fft-variant0-1k: $(FFT_VARIANT0_1K_TEST)
 	$(FFT_VARIANT0_1K_TEST)
-	$(SHUFL_PERMUTATION_TEST)
 
 test-shufl-permutation: $(SHUFL_PERMUTATION_TEST)
 	$(SHUFL_PERMUTATION_TEST)
@@ -288,7 +291,6 @@ test-shufl-permutation: $(SHUFL_PERMUTATION_TEST)
 $(SHUFL_PERMUTATION_TEST): tests/shufl_permutation_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(wildcard src/cl/*.cl)
 	@mkdir -p build-tests
 	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra -Isrc tests/shufl_permutation_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(OPENCL_LIBS) -o $@
-	$(STATS_SLOT_TEST)
 
 test-stats-slot: $(STATS_SLOT_TEST)
 	$(STATS_SLOT_TEST)
@@ -303,6 +305,36 @@ test-apple-fftp61-seed: $(APPLE_FFTP61_SEED_TEST)
 $(APPLE_FFTP61_SEED_TEST): tests/apple_fftp61_scalar_seed_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(wildcard src/cl/*.cl)
 	@mkdir -p build-tests
 	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra -Isrc tests/apple_fftp61_scalar_seed_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(OPENCL_LIBS) -o $@
+
+test-apple-tailzero-halfline: $(APPLE_TAILZERO_TEST)
+	$(APPLE_TAILZERO_TEST)
+
+$(APPLE_TAILZERO_TEST): tests/apple_tailzero_halfline_test.cpp src/AppleTailZero.h src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(wildcard src/cl/*.cl)
+	@mkdir -p build-tests
+	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra -Isrc tests/apple_tailzero_halfline_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(OPENCL_LIBS) -o $@
+
+test-radix1k-policy: $(RADIX1K_POLICY_TEST) $(RADIX1K_POLICY_APPLE_TEST)
+	$(RADIX1K_POLICY_TEST)
+	$(RADIX1K_POLICY_APPLE_TEST)
+
+$(RADIX1K_POLICY_TEST): tests/radix1k_policy_test.cpp src/FFTConfig.h
+	@mkdir -p build-tests
+	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra -Isrc tests/radix1k_policy_test.cpp -o $@
+
+$(RADIX1K_POLICY_APPLE_TEST): tests/radix1k_policy_test.cpp src/FFTConfig.h
+	@mkdir -p build-tests
+	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra -DAEVUM_FORCE_RADIX4_1K=1 -Isrc tests/radix1k_policy_test.cpp -o $@
+
+test-gf61-limb32-cmul: $(GF61_LIMB32_CMUL_TEST)
+	$(GF61_LIMB32_CMUL_TEST)
+
+$(GF61_LIMB32_CMUL_TEST): tests/gf61_limb32_cmul_kernel_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(wildcard src/cl/*.cl)
+	@mkdir -p build-tests
+	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra -Isrc tests/gf61_limb32_cmul_kernel_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(OPENCL_LIBS) -o $@
+
+$(WMUL_LIMIT_TEST): tests/wmul_limit_test.cpp src/WmulLimit.h
+	@mkdir -p build-tests
+	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra -Isrc tests/wmul_limit_test.cpp -o $@
 
 $(FFT8_SKIP1_TEST): tests/fft8_skip1_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(wildcard src/cl/*.cl)
 	@mkdir -p build-tests
