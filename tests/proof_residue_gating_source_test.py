@@ -35,6 +35,16 @@ for driver in ("RunPrpOrLlMarin.cpp", "RunPrpOrLl.cpp"):
     assert "backupManager.clearState();" not in tail_of_head, driver
 
 marin = body("RunPrpOrLlMarin.cpp")
-assert re.search(r"if \(resultSaved\) \{\s*backupManager\.clearState\(\);\s*delete_checkpoints\(", marin)
+# The checkpoint removal (delete_checkpoints, or the removal of this run's own
+# checkpoint file and its .old/.new) sits inside the resultSaved gate.
+gated = re.search(r"if \(resultSaved\) \{(.*?)\n    \}", marin, re.S)
+assert gated, "Marin: no resultSaved block"
+assert "backupManager.clearState();" in gated.group(1)
+assert ("delete_checkpoints(" in gated.group(1)
+        or all(f"std::filesystem::remove({f}, ec);" in gated.group(1)
+               for f in ("ckpt_file", "ckpt_file + \".old\"", "ckpt_file + \".new\"")))
+head_marin = (ROOT / "src/modes/RunPrpOrLlMarin.cpp").read_text()
+head_marin = head_marin[:head_marin.index("bool resultSaved = wm.saveIndividualJson")]
+assert "std::filesystem::remove(ckpt_file" not in head_marin[-1500:]
 
 print("Proof residue gating source regression: PASS")
