@@ -26,6 +26,10 @@ public:
     void checkpointMarin(engine::digit host, uint32_t iter);
     std::filesystem::path proof() const;
     bool shouldCheckpoint(uint32_t iter) const;
+    // Power of the proof proof() writes: the one the checkpoints were saved for.
+    uint32_t power() const { return proofSet_.power; }
+    // Lower the power residues are saved for; see ProofSetMarin::setPower.
+    void setPower(uint32_t newPower) { proofSet_.setPower(newPower); }
 
 private:
     ProofSetMarin           proofSet_;
