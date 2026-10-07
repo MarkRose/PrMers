@@ -66,7 +66,7 @@ $(SRC_DIR)/modes/RunGaussianMersenneFactor.o: CPPFLAGS += -include $(INC_DIR)/co
 MARIN_TEST_DEVICE ?= 0
 
 .PHONY: all clean install uninstall package aevum aevum-cuda aevum-engine \
-        install-aevum-engine test-aevum-host test-aevum-reg test-aevum-auto test-aevum-default test-aevum-pfa9-bridge test-gui-state test-gui-http test-pm1-bounds test-proof-marin test-ecm-torsion test-marin-ibdwt-bound test-worktodo-manager test-wagstaff-worktodo test-marin-ll-radix5 test-proof-power test-proof-verify test-marin-invalid-device test-aevum-source test-aevum-auto-gpu test-backend-matrix test-aevum-apple-port-source test-gm clean-all test-marin-split-aux test-tiny-exponent test-final-carry-digit0 test-proof-fallback-power test-proof-checkpoint-readback test-proof-resume-power test-proof-residue-cleanup test-compact-bits-wrap test-mersenne-reduce test-proof-cpu-fallback test-ecm-resume-line-checksum test-ecm-resume-curve-index test-ecm-stage2-u64-primes test-ecm-te16-construction-factor test-ecm-small-items test-ecm-mont-stage2-resume
+        install-aevum-engine test-aevum-host test-aevum-reg test-aevum-auto test-aevum-default test-aevum-pfa9-bridge test-gui-state test-gui-http test-pm1-bounds test-proof-marin test-ecm-torsion test-marin-ibdwt-bound test-worktodo-manager test-wagstaff-worktodo test-marin-ll-radix5 test-proof-power test-proof-verify test-marin-invalid-device test-aevum-source test-aevum-auto-gpu test-backend-matrix test-aevum-apple-port-source test-gm clean-all test-marin-split-aux test-tiny-exponent test-final-carry-digit0 test-proof-fallback-power test-proof-checkpoint-readback test-proof-resume-power test-proof-residue-cleanup test-compact-bits-wrap test-mersenne-reduce test-proof-cpu-fallback test-ecm-resume-line-checksum test-ecm-resume-curve-index test-ecm-stage2-u64-primes test-ecm-te16-construction-factor test-ecm-small-items test-ecm-mont-stage2-resume test-ecm-prime95-relative-path
 
 all: aevum-engine $(TARGET)
 
@@ -171,6 +171,9 @@ test-ecm-small-items:
 
 test-ecm-mont-stage2-resume:
 	python3 tests/ecm_mont_stage2_resume_test.py
+
+test-ecm-prime95-relative-path:
+	bash tests/ecm_prime95_relative_path_test.sh $${PRMERS_TEST_DEVICE:-0}
 
 # Marin transform-size bound: exact 128-bit check and OpenCL/GMP device check.
 test-marin-ibdwt-bound:
