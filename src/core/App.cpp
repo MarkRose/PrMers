@@ -64,6 +64,7 @@
 #include <sstream>
 #include <tuple>
 #include <atomic>
+#include <mutex>
 #include <fstream>
 #include <memory>
 #include <optional>
@@ -942,6 +943,11 @@ int App::runGpuBenchmarkMarin() {
 
 namespace {
   std::atomic<bool> g_stop{false};
+  // Set by the GUI "Append & Run" handler (HTTP worker thread) after it has appended a line to
+  // worktodo. It never interrupts a running test: the running mode picks the line up when its
+  // entry finishes, and the idle loops in App::run() (main thread) start it when nothing is running.
+  std::atomic<bool> g_gui_append_pending{false};
+  std::mutex g_worktodo_append_mutex;
   void handle_signal(int) noexcept {
     g_stop.store(true, std::memory_order_relaxed);
     core::algo::interrupted.store(true, std::memory_order_relaxed);
@@ -986,6 +992,18 @@ static void install_signal_handlers() {
 
 
 
+// Called from the main thread while the GUI is idle: if "Append & Run" added a line since the last
+// check, restart so the new entry starts. Nothing is running at this point, so no work is lost.
+static void gui_restart_for_appended_entry(const std::shared_ptr<ui::WebGuiServer>& gui, int argc, char** argv) {
+    if (!g_gui_append_pending.exchange(false, std::memory_order_acq_rel)) return;
+    std::cout << "Starting appended worktodo entry\n";
+    if (gui) {
+        gui->appendLog("Starting appended worktodo entry");
+        gui->stop();
+    }
+    restart_self(argc, argv);
+}
+
 static bool file_non_empty(const std::string& p) {
     std::ifstream f(p, std::ios::binary);
     if (!f.is_open()) return false;
@@ -1012,12 +1030,22 @@ int App::run() {
         cfg.results_path = (std::filesystem::path(options.save_path.empty() ? "." : options.save_path) / "results.txt").string();
         static std::atomic<bool> gui_alive{true};
         auto submitFn = [this](const std::string& line){
-            std::ofstream out(this->options.worktodo_path, std::ios::app);
-            out << line << "\n";
-            out.close();
-            std::cout << "worktodo appended\n";
-            if (guiServer_) guiServer_->stop();
-            restart_self(argc_, argv_);
+            // Runs on the HTTP worker thread: only append. Restarting from here would kill the
+            // running test without a checkpoint (and repeated requests would keep restarting it).
+            {
+                std::lock_guard<std::mutex> lock(g_worktodo_append_mutex);
+                std::ofstream out(this->options.worktodo_path, std::ios::app);
+                out << line << "\n";
+                out.close();
+                if (!out) {
+                    std::cerr << "Failed to append to " << this->options.worktodo_path << "\n";
+                    if (guiServer_) guiServer_->appendLog("Failed to append to " + this->options.worktodo_path);
+                    return;
+                }
+            }
+            std::cout << "worktodo appended; it starts after the current entry finishes (immediately if idle)\n";
+            if (guiServer_) guiServer_->appendLog("worktodo appended; it starts after the current entry finishes (immediately if idle)");
+            g_gui_append_pending.store(true, std::memory_order_release);
         };
         auto stopFn = [&](){
             handle_signal(SIGINT);
@@ -1060,7 +1088,10 @@ int App::run() {
         }
         if (!file_non_empty(cfg.worktodo_path)) {
             guiServer_->setStatus("Idle");
-            while (!g_stop && gui_alive) std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            while (!g_stop && gui_alive) {
+                gui_restart_for_appended_entry(guiServer_, argc_, argv_);
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            }
             if (guiServer_) guiServer_->stop();
             return 0;
         }
@@ -1353,7 +1384,10 @@ int App::run() {
         }
         install_signal_handlers();
         g_stop = 0;
-        while (!g_stop) std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        while (!g_stop) {
+            gui_restart_for_appended_entry(guiServer_, argc_, argv_);
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
         if (guiServer_) guiServer_->stop();
     }
 
