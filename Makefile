@@ -291,6 +291,10 @@ test-gm-ecm-resume:
 	g++ -std=c++20 -Wall -Wextra -Iinclude tests/gm_ecm_progress_test.cpp -o /tmp/prmers-gm-ecm-resume-test/gm_ecm_progress_test
 	/tmp/prmers-gm-ecm-resume-test/gm_ecm_progress_test
 
+.PHONY: test-gm-factor-checkpoint-write-failure
+test-gm-factor-checkpoint-write-failure:
+	bash tests/gm_factor_checkpoint_write_failure_test.sh
+
 .PHONY: test-gm-pm1-vtrace-checkpoint
 test-gm-pm1-vtrace-checkpoint: all
 	python3 tests/gm_pm1_vtrace_checkpoint_source_test.py
