@@ -26,7 +26,13 @@ fi
   "$ROOT/tests/gaussian_tf_preparser_test.cpp" \
   "$ROOT/src/modes/RunGaussianTrialFactor.cpp" \
   "$ROOT/src/opencl/Context.cpp" \
+  "$ROOT/src/io/WorktodoParser.cpp" \
+  "$ROOT/src/ui/WebGuiServer.cpp" \
+  "$ROOT/src/util/StringUtils.cpp" \
+  "$ROOT/src/math/Pm1Bounds.cpp" \
+  "$ROOT/src/math/Cofactor.cpp" \
   "${OCL_LIBS[@]}" \
+  -pthread -lgmpxx -lgmp \
   -o "$BUILD/gaussian-tf-preparser-test"
 
 "$BUILD/gaussian-tf-preparser-test"
