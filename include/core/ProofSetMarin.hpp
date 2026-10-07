@@ -24,12 +24,16 @@ private:
 class ProofSetMarin {
 public:
     const uint32_t E;     // exponent
-    const uint32_t power; // proof power level
+    uint32_t power;       // proof power level (see setPower)
     const std::vector<std::string> knownFactors; // known factors (for cofactor tests)
 
     ProofSetMarin(uint32_t exponent, uint32_t proofLevel, std::vector<std::string> factors = {});
 
     bool shouldCheckpoint(uint32_t iter) const;
+    // Lower the power residues are saved for (a resumed test may lack the
+    // residues of earlier points). The points of a lower power are a subset
+    // of those of the original power.
+    void setPower(uint32_t newPower);
     void save(uint32_t iter, const std::vector<uint32_t>& words);
     std::vector<uint32_t> load(uint32_t iter) const;
 
@@ -38,6 +42,14 @@ public:
     static bool isInPoints(uint32_t E, uint32_t power, uint32_t k);
     static std::filesystem::path proofPath(uint32_t E);
     static double diskUsageGB(uint32_t E, uint32_t power);
+    // Checkpoint iterations of a proof of this power, ascending, ending with E.
+    static std::vector<uint32_t> proofPoints(uint32_t E, uint32_t power);
+    // True when every residue a proof of this power needs from iterations up
+    // to currentK is on disk, and the newest of them reads back intact.
+    static bool canDo(uint32_t E, uint32_t power, uint32_t currentK);
+    // The highest power <= power that canDo for a test resumed at currentK,
+    // or 0 when no proof is possible.
+    static uint32_t effectivePower(uint32_t E, uint32_t power, uint32_t currentK);
     
     // Core proof generation algorithm
     ProofMarin computeProof() const;
@@ -45,8 +57,8 @@ public:
 private:
     std::vector<uint32_t> points; // checkpoint iteration points
     
-    bool isValidTo(uint32_t limitK) const;
-    bool fileExists(uint32_t k) const;
+    static bool fileExists(uint32_t E, uint32_t k);
+    static std::vector<uint32_t> loadResidue(uint32_t E, uint32_t iter);
 };
 
 } // namespace core

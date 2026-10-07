@@ -239,6 +239,29 @@ int App::runPrpOrLlMarin()
         eng->set(R0, (options.mode == "prp") ? 3 : 4);
     }
 
+    // A test resumed at iteration ri needs every proof residue of the points
+    // before ri. If some are missing (or damaged), lower the proof power to
+    // the highest one the residues on disk still allow, or drop the proof,
+    // now and not after the whole test has run.
+    if (r == 0 && ri > 0 && options.mode == "prp" && options.proof) {
+        const uint32_t wanted = proofManagerMarin.power();
+        const uint32_t usable = ProofSetMarin::effectivePower(options.exponent, wanted, static_cast<uint32_t>(ri));
+        if (usable != wanted) {
+            std::ostringstream oss;
+            if (usable == 0) {
+                oss << "Proof residues before iteration " << ri << " are missing: proof generation disabled for this test.";
+                options.proof = false;
+                options.proofFile.clear();
+            } else {
+                oss << "Proof residues before iteration " << ri << " are missing: proof of power " << usable << " (instead of " << wanted << ").";
+            }
+            std::cout << oss.str() << std::endl;
+            if (guiServer_) guiServer_->appendLog(oss.str());
+            proofManagerMarin.setPower(usable);
+            options.proofPower = usable;
+        }
+    }
+
     eng->copy(R4, R0);//Last correct state
     eng->copy(R5, R1);//Last correct bufd
     eng->set(RBASE, 3);
