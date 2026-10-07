@@ -540,6 +540,7 @@ continue;
             WorktodoEntry entry;
             entry.prpTest   = isPRP;
             entry.llTest    = isLL;
+            entry.doubleCheck = isDoubleCheck;
             entry.exponent  = exp;
             entry.rawLine   = line;
             entry.aid       = aid;
