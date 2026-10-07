@@ -206,6 +206,10 @@ SHUFL_PERMUTATION_TEST := build-tests/aevum-shufl-permutation-test
 AUTOTUNE_CACHE_TEST := build-tests/aevum-runtime-autotune-cache-test
 
 .PHONY: test test-host test-shufl-permutation test-gpu test-pfa9-lead-bridge-gpu
+STATS_SLOT_TEST := build-tests/aevum-stats-slot-test
+AUTOTUNE_CACHE_TEST := build-tests/aevum-runtime-autotune-cache-test
+
+.PHONY: test test-host test-stats-slot test-gpu test-pfa9-lead-bridge-gpu
 
 test: test-host
 
@@ -213,7 +217,7 @@ $(MONOLITHIC_SOURCE_TEST): tests/opencl_monolithic_source_test.cpp src/OpenCLSou
 	@mkdir -p build-tests
 	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra tests/opencl_monolithic_source_test.cpp src/OpenCLSourceBuilder.cpp -o $@
 
-test-host: $(MONOLITHIC_SOURCE_TEST) $(HOST_TEST) $(STATE_TEST) $(OPENCL_STANDARD_TEST) $(TYPE4_PLAN_TEST) $(FFT_SIZE_ONLY_SPEC_TEST) $(AUTOTUNE_CACHE_TEST) $(EVENT_STATUS_TEST) $(FFT8_SKIP1_TEST) $(FFT_CARRY32_GATE_TEST) $(FFT_SPEC_ROBUSTNESS_TEST) $(ARGS_VALUE_FOR_TEST) $(TRIG_CACHE_KEY_TEST) $(FFT_EXPLICIT_CAPACITY_TEST) $(FFT_VARIANT0_1K_TEST) $(SHUFL_PERMUTATION_TEST)
+test-host: $(MONOLITHIC_SOURCE_TEST) $(HOST_TEST) $(STATE_TEST) $(OPENCL_STANDARD_TEST) $(TYPE4_PLAN_TEST) $(FFT_SIZE_ONLY_SPEC_TEST) $(AUTOTUNE_CACHE_TEST) $(EVENT_STATUS_TEST) $(FFT8_SKIP1_TEST) $(FFT_CARRY32_GATE_TEST) $(FFT_SPEC_ROBUSTNESS_TEST) $(ARGS_VALUE_FOR_TEST) $(TRIG_CACHE_KEY_TEST) $(FFT_EXPLICIT_CAPACITY_TEST) $(FFT_VARIANT0_1K_TEST) $(SHUFL_PERMUTATION_TEST) $(STATS_SLOT_TEST)
 	$(MONOLITHIC_SOURCE_TEST)
 	bash tests/opencl12_syntax_test.sh
 	bash tests/pow2_type4_opencl_syntax.sh
@@ -244,6 +248,10 @@ test-host: $(MONOLITHIC_SOURCE_TEST) $(HOST_TEST) $(STATE_TEST) $(OPENCL_STANDAR
 	python3 tests/tail_kernels_range_source_test.py
 	python3 tests/native_tune_compat_source_test.py
 	python3 tests/asm_string_braces_test.py
+	python3 tests/kernel_config_guards_test.py
+	python3 tests/carryfused_weight_shift_modulus_test.py
+	python3 tests/carry_gf61_seed_overflow_test.py
+	python3 tests/prp_middle1_type_gate_test.py
 	$(HOST_TEST)
 	$(STATE_TEST)
 	$(OPENCL_STANDARD_TEST)
@@ -273,6 +281,14 @@ test-shufl-permutation: $(SHUFL_PERMUTATION_TEST)
 $(SHUFL_PERMUTATION_TEST): tests/shufl_permutation_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(wildcard src/cl/*.cl)
 	@mkdir -p build-tests
 	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra -Isrc tests/shufl_permutation_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(OPENCL_LIBS) -o $@
+	$(STATS_SLOT_TEST)
+
+test-stats-slot: $(STATS_SLOT_TEST)
+	$(STATS_SLOT_TEST)
+
+$(STATS_SLOT_TEST): tests/stats_slot_test.cpp src/StatsSlot.h src/common.h
+	@mkdir -p build-tests
+	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra -Isrc tests/stats_slot_test.cpp -o $@
 
 $(FFT8_SKIP1_TEST): tests/fft8_skip1_test.cpp src/clwrap.cpp src/log.cpp src/File.cpp src/common.cpp src/fs.cpp src/timeutil.cpp $(wildcard src/cl/*.cl)
 	@mkdir -p build-tests
