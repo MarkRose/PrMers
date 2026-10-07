@@ -465,3 +465,8 @@ test-gm-chain-resume:
 	mkdir -p /tmp/prmers-gm-chain-resume-test
 	g++ -std=c++20 -Wall -Wextra -Iinclude tests/gm_chain_progress_test.cpp -o /tmp/prmers-gm-chain-resume-test/gm_chain_progress_test
 	/tmp/prmers-gm-chain-resume-test/gm_chain_progress_test
+
+.PHONY: test-gm-pm1-vtrace-checkpoint
+test-gm-pm1-vtrace-checkpoint: all
+	python3 tests/gm_pm1_vtrace_checkpoint_source_test.py
+	bash tests/gm_pm1_vtrace_checkpoint_test.sh $${PRMERS_TEST_DEVICE:-0}
