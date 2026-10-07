@@ -290,3 +290,8 @@ test-gm-ecm-resume:
 	mkdir -p /tmp/prmers-gm-ecm-resume-test
 	g++ -std=c++20 -Wall -Wextra -Iinclude tests/gm_ecm_progress_test.cpp -o /tmp/prmers-gm-ecm-resume-test/gm_ecm_progress_test
 	/tmp/prmers-gm-ecm-resume-test/gm_ecm_progress_test
+
+.PHONY: test-gm-pm1-vtrace-checkpoint
+test-gm-pm1-vtrace-checkpoint: all
+	python3 tests/gm_pm1_vtrace_checkpoint_source_test.py
+	bash tests/gm_pm1_vtrace_checkpoint_test.sh $${PRMERS_TEST_DEVICE:-0}
