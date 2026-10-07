@@ -66,7 +66,7 @@ $(SRC_DIR)/modes/RunGaussianMersenneFactor.o: CPPFLAGS += -include $(INC_DIR)/co
 MARIN_TEST_DEVICE ?= 0
 
 .PHONY: all clean install uninstall package aevum aevum-cuda aevum-engine \
-        install-aevum-engine test-aevum-host test-aevum-reg test-aevum-auto test-aevum-default test-aevum-pfa9-bridge test-gui-state test-gui-http test-pm1-bounds test-proof-marin test-ecm-torsion test-marin-ibdwt-bound test-worktodo-manager test-wagstaff-worktodo test-marin-ll-radix5 test-proof-power test-proof-verify test-marin-invalid-device test-aevum-source test-aevum-auto-gpu test-backend-matrix test-aevum-apple-port-source test-gm clean-all test-marin-split-aux test-tiny-exponent test-final-carry-digit0 test-proof-fallback-power test-proof-checkpoint-readback test-proof-resume-power test-proof-residue-cleanup test-compact-bits-wrap test-mersenne-reduce test-proof-cpu-fallback test-ecm-resume-line-checksum test-ecm-resume-curve-index
+        install-aevum-engine test-aevum-host test-aevum-reg test-aevum-auto test-aevum-default test-aevum-pfa9-bridge test-gui-state test-gui-http test-pm1-bounds test-proof-marin test-ecm-torsion test-marin-ibdwt-bound test-worktodo-manager test-wagstaff-worktodo test-marin-ll-radix5 test-proof-power test-proof-verify test-marin-invalid-device test-aevum-source test-aevum-auto-gpu test-backend-matrix test-aevum-apple-port-source test-gm clean-all test-marin-split-aux test-tiny-exponent test-final-carry-digit0 test-proof-fallback-power test-proof-checkpoint-readback test-proof-resume-power test-proof-residue-cleanup test-compact-bits-wrap test-mersenne-reduce test-proof-cpu-fallback test-ecm-resume-line-checksum test-ecm-resume-curve-index test-ecm-stage2-u64-primes
 
 all: aevum-engine $(TARGET)
 
@@ -159,6 +159,9 @@ test-ecm-resume-line-checksum:
 
 test-ecm-resume-curve-index:
 	python3 tests/ecm_resume_curve_index_source_test.py
+
+test-ecm-stage2-u64-primes:
+	python3 tests/ecm_stage2_u64_primes_source_test.py
 
 # Marin transform-size bound: exact 128-bit check and OpenCL/GMP device check.
 test-marin-ibdwt-bound:
