@@ -272,6 +272,7 @@ test-proof-resume-power:
 
 test-proof-residue-cleanup:
 	bash tests/test_proof_residue_cleanup.sh
+	python3 tests/proof_residue_gating_source_test.py
 
 test-compact-bits-wrap:
 	bash tests/test_compact_bits_wrap.sh

@@ -179,6 +179,38 @@ void ProofSetMarin::clearResidues(uint32_t E) {
   std::filesystem::remove(std::filesystem::path(std::to_string(E)), ec);
 }
 
+ProofSetMarin::ResidueAction ProofSetMarin::residueAction(
+    bool isPrp, bool wagstaff, bool proofRequested, bool proofCompleted,
+    bool resultSaved) {
+  if (!isPrp || wagstaff)
+    return ResidueAction::NotApplicable;
+  if (!resultSaved)
+    return ResidueAction::KeepResultNotSaved;
+  if (proofRequested && !proofCompleted)
+    return ResidueAction::KeepProofFailed;
+  return ResidueAction::Clear;
+}
+
+std::string ProofSetMarin::residuesKeptMessage(uint32_t E, ResidueAction action) {
+  std::error_code ec;
+  auto dir = std::filesystem::absolute(proofPath(E), ec);
+  if (ec)
+    dir = proofPath(E);
+  std::string why;
+  switch (action) {
+    case ResidueAction::KeepResultNotSaved:
+      why = "the result could not be saved, so the test will be rerun";
+      break;
+    case ResidueAction::KeepProofFailed:
+      why = "no verified proof was made, so a later run can retry it";
+      break;
+    default:
+      return std::string();
+  }
+  return "Proof residues kept in " + dir.string() + " (" + why +
+         "). They take several GB; delete that directory by hand when you no longer need them.";
+}
+
 std::vector<uint32_t> ProofSetMarin::loadResidue(uint32_t E, uint32_t iter) {
   auto filePath = proofPath(E) / std::to_string(iter);
   std::ifstream file(filePath, std::ios::binary);

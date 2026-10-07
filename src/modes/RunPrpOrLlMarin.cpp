@@ -779,6 +779,10 @@ int App::runPrpOrLlMarin()
             provisionalJson);
     }
 
+    // The residues are only deleted once a requested proof has been made (and
+    // verified, unless -noverify); see ProofSetMarin::residueAction.
+    const bool proofRequested = options.mode == "prp" && options.proof;
+    bool proofCompleted = false;
     if (options.mode == "prp" && options.proof) {
         try {
             std::cout << "\nGenerating PRP proof file..." << std::endl;
@@ -879,6 +883,7 @@ int App::runPrpOrLlMarin()
             }
 
             options.proofFile = proofFilePath.string();
+            proofCompleted = true;
 
             std::cout
                 << "Proof file saved: "
@@ -998,26 +1003,40 @@ int App::runPrpOrLlMarin()
         }
     }*/
 
-    backupManager.clearState();
     io::WorktodoManager wm(options);
     bool resultSaved = wm.saveIndividualJson(options.wagstaff ? options.exponent / 2 : options.exponent,
                                              options.wagstaff ? "wagstaff" : options.mode, json);
     resultSaved = wm.appendToResultsTxt(json) && resultSaved;
-    // Remove this run's own checkpoint (llunsafe_ for LL, wagstaff_ for Wagstaff), not the one
-    // that delete_checkpoints derives for PRP, which would remove another test's m_<p>.ckpt.
-    {
+    // Keep the checkpoint and the proof residues unless the result is safely
+    // on disk: a rerun then resumes at the end and retries the write instead of
+    // starting from iteration 0.
+    if (resultSaved) {
+        backupManager.clearState();
+        // Remove this run's own checkpoint (llunsafe_ for LL, wagstaff_ for Wagstaff), not the one
+        // that delete_checkpoints derives for PRP, which would remove another test's m_<p>.ckpt.
         std::error_code ec;
         std::filesystem::remove(ckpt_file, ec);
         std::filesystem::remove(ckpt_file + ".old", ec);
         std::filesystem::remove(ckpt_file + ".new", ec);
     }
-    // The proof (if any) is written and the test is over: the residues are of
-    // no further use and take about 10-18 GB at the wavefront.
-    if (options.mode == "prp" && !options.wagstaff)
+    const auto residueAction = ProofSetMarin::residueAction(
+        options.mode == "prp", options.wagstaff, proofRequested,
+        proofCompleted, resultSaved);
+    if (residueAction == ProofSetMarin::ResidueAction::Clear) {
+        // The proof (if any) is written and the test is over: the residues
+        // are of no further use and take about 10-18 GB at the wavefront.
         ProofSetMarin::clearResidues(options.exponent);
-    backupManager.clearState();
-    if (hasWorktodoEntry_ && !resultSaved) {
-        std::cerr << "Result could not be saved; keeping the entry in " << options.worktodo_path << "\n";
+    } else if (residueAction != ProofSetMarin::ResidueAction::NotApplicable) {
+        const std::string msg =
+            ProofSetMarin::residuesKeptMessage(options.exponent, residueAction);
+        std::cerr << msg << std::endl;
+        if (guiServer_)
+            guiServer_->appendLog(msg);
+    }
+    if (!resultSaved) {
+        std::cerr << "Result could not be saved; keeping the checkpoint"
+                  << (hasWorktodoEntry_ ? std::string(" and the entry in ") + options.worktodo_path : std::string())
+                  << "\n";
     }
     if (hasWorktodoEntry_ && resultSaved) {
         if (worktodoParser_->removeProcessedLine(activeWorktodoRawLine_)) {
