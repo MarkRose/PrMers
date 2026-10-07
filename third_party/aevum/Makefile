@@ -195,6 +195,7 @@ FFT_CARRY32_GATE_TEST := build-tests/aevum-fft-carry32-gate-test
 FFT_SPEC_ROBUSTNESS_TEST := build-tests/aevum-fft-spec-robustness-test
 ARGS_VALUE_FOR_TEST := build-tests/aevum-args-value-for-test
 TRIG_CACHE_KEY_TEST := build-tests/aevum-trig-cache-key-test
+FFT_EXPLICIT_CAPACITY_TEST := build-tests/aevum-fft-explicit-capacity-test
 EVENT_STATUS_TEST := build-tests/aevum-event-status-test
 FFT8_SKIP1_TEST := build-tests/aevum-fft8-skip1-test
 AUTOTUNE_CACHE_TEST := build-tests/aevum-runtime-autotune-cache-test
@@ -207,7 +208,7 @@ $(MONOLITHIC_SOURCE_TEST): tests/opencl_monolithic_source_test.cpp src/OpenCLSou
 	@mkdir -p build-tests
 	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra tests/opencl_monolithic_source_test.cpp src/OpenCLSourceBuilder.cpp -o $@
 
-test-host: $(MONOLITHIC_SOURCE_TEST) $(HOST_TEST) $(STATE_TEST) $(OPENCL_STANDARD_TEST) $(TYPE4_PLAN_TEST) $(FFT_SIZE_ONLY_SPEC_TEST) $(AUTOTUNE_CACHE_TEST) $(EVENT_STATUS_TEST) $(FFT8_SKIP1_TEST) $(FFT_CARRY32_GATE_TEST) $(FFT_SPEC_ROBUSTNESS_TEST) $(ARGS_VALUE_FOR_TEST) $(TRIG_CACHE_KEY_TEST)
+test-host: $(MONOLITHIC_SOURCE_TEST) $(HOST_TEST) $(STATE_TEST) $(OPENCL_STANDARD_TEST) $(TYPE4_PLAN_TEST) $(FFT_SIZE_ONLY_SPEC_TEST) $(AUTOTUNE_CACHE_TEST) $(EVENT_STATUS_TEST) $(FFT8_SKIP1_TEST) $(FFT_CARRY32_GATE_TEST) $(FFT_SPEC_ROBUSTNESS_TEST) $(ARGS_VALUE_FOR_TEST) $(TRIG_CACHE_KEY_TEST) $(FFT_EXPLICIT_CAPACITY_TEST)
 	$(MONOLITHIC_SOURCE_TEST)
 	bash tests/opencl12_syntax_test.sh
 	bash tests/pow2_type4_opencl_syntax.sh
@@ -245,6 +246,7 @@ test-host: $(MONOLITHIC_SOURCE_TEST) $(HOST_TEST) $(STATE_TEST) $(OPENCL_STANDAR
 	$(FFT_SPEC_ROBUSTNESS_TEST)
 	$(ARGS_VALUE_FOR_TEST)
 	$(TRIG_CACHE_KEY_TEST)
+	$(FFT_EXPLICIT_CAPACITY_TEST)
 	$(AUTOTUNE_CACHE_TEST)
 	$(EVENT_STATUS_TEST)
 	$(FFT8_SKIP1_TEST)
@@ -294,6 +296,12 @@ $(ARGS_VALUE_FOR_TEST): tests/args_value_for_test.cpp src/Args.cpp src/Args.h sr
 $(TRIG_CACHE_KEY_TEST): tests/trig_cache_key_test.cpp src/TrigBufCache.h
 	@mkdir -p build-tests
 	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra -Isrc tests/trig_cache_key_test.cpp -o $@
+
+$(FFT_EXPLICIT_CAPACITY_TEST): tests/fft_explicit_capacity_test.cpp src/FFTConfig.cpp src/FFTConfig.h src/Args.cpp src/TuneEntry.cpp src/common.cpp src/fs.cpp src/File.cpp src/timeutil.cpp
+	@mkdir -p build-tests
+	$(CXX) -O2 -std=c++20 $(DARWIN_MIN_FLAGS) -Wall -Wextra $(TEST_SECTION_FLAGS) -Isrc \
+		tests/fft_explicit_capacity_test.cpp src/PrpUseTune.cpp src/RuntimeAutotune.cpp src/FFTConfig.cpp src/Args.cpp src/TuneEntry.cpp src/common.cpp src/fs.cpp src/File.cpp src/timeutil.cpp \
+		$(TEST_GC_LINK) -o $@
 
 $(HOST_TEST): tests/host_gf_test.cpp
 	@mkdir -p build-tests
