@@ -159,6 +159,10 @@ test-worktodo-manager:
 test-worktodo-exponent-range:
 	bash tests/test_worktodo_exponent_range.sh
 
+.PHONY: test-gaussian-tf-preparser
+test-gaussian-tf-preparser:
+	bash tests/test_gaussian_tf_preparser.sh
+
 test-marin-ll-radix5: all
 	bash tests/run_marin_ll_radix5_regression.sh $${AEVUM_TEST_DEVICE:-0}
 
