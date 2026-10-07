@@ -367,6 +367,10 @@ test-error-check-retry:
 test-llsafe-error-recovery: all
 	bash tests/run_llsafe_error_recovery_regression.sh $${AEVUM_TEST_DEVICE:-0}
 
+.PHONY: test-llunsafe-checkpoint-cleanup
+test-llunsafe-checkpoint-cleanup: all
+	bash tests/run_llunsafe_checkpoint_cleanup.sh $${AEVUM_TEST_DEVICE:-0}
+
 .PHONY: test-marin-exact-sub
 
 test-marin-exact-sub:
