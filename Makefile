@@ -263,6 +263,9 @@ test-pm1-stage2-record-factor: all
 test-pm1-bsgs-small-b1: all
 	bash tests/pm1_bsgs_small_b1_test.sh $${PRMERS_TEST_DEVICE:-0}
 
+test-pm1-prime95-stage2-result: all
+	bash tests/pm1_prime95_stage2_result_test.sh $${PRMERS_TEST_DEVICE:-0}
+
 test-backend-compat: all
 	bash tests/test_backend_compatibility_cli.sh
 
