@@ -264,6 +264,10 @@ test-llsafe2-resume: all
 test-llsafe2-result: all
 	bash tests/run_llsafe2_result_regression.sh $${AEVUM_TEST_DEVICE:-0}
 
+.PHONY: test-llunsafe-checkpoint-cleanup
+test-llunsafe-checkpoint-cleanup: all
+	bash tests/run_llunsafe_checkpoint_cleanup.sh $${AEVUM_TEST_DEVICE:-0}
+
 .PHONY: test-marin-exact-sub
 
 test-marin-exact-sub:
