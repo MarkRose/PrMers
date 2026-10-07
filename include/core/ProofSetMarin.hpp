@@ -41,6 +41,10 @@ public:
     static uint32_t bestPower(uint32_t E);
     static bool isInPoints(uint32_t E, uint32_t power, uint32_t k);
     static std::filesystem::path proofPath(uint32_t E);
+    // Remove the saved proof residues of exponent E (<E>/proof, and <E> when
+    // that leaves it empty). Call when the test is over and the proof has
+    // been made or given up; a test that can still be resumed needs them.
+    static void clearResidues(uint32_t E);
     static double diskUsageGB(uint32_t E, uint32_t power);
     // Checkpoint iterations of a proof of this power, ascending, ending with E.
     static std::vector<uint32_t> proofPoints(uint32_t E, uint32_t power);
