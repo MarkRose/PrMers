@@ -322,6 +322,10 @@ test-gm-u64-divisor:
 	g++ -std=c++20 -Wall -Wextra -Iinclude tests/gm_u64_divisor_test.cpp -o /tmp/prmers-gm-u64-divisor-test/gm_u64_divisor_test -lgmpxx -lgmp
 	/tmp/prmers-gm-u64-divisor-test/gm_u64_divisor_test
 
+.PHONY: test-gm-small-items
+test-gm-small-items: all
+	bash tests/gm_small_items_test.sh
+
 .PHONY: test-gm-ecm-resume
 test-gm-ecm-resume:
 	python3 tests/gm_ecm_resume_source_test.py
