@@ -371,6 +371,10 @@ test-llsafe-error-recovery: all
 test-llunsafe-checkpoint-cleanup: all
 	bash tests/run_llunsafe_checkpoint_cleanup.sh $${AEVUM_TEST_DEVICE:-0}
 
+.PHONY: test-legacy-prp-resume
+test-legacy-prp-resume: all
+	bash tests/run_legacy_prp_resume_regression.sh $${AEVUM_TEST_DEVICE:-0}
+
 .PHONY: test-marin-exact-sub
 
 test-marin-exact-sub:
