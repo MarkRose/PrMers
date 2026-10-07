@@ -199,6 +199,10 @@ test-legacy-small-items:
 test-worktodo-small-items:
 	bash tests/test_worktodo_small_items.sh
 
+.PHONY: test-self-exe-restart
+test-self-exe-restart:
+	bash tests/test_self_exe_restart.sh
+
 test-marin-invalid-device:
 	mkdir -p tests/build-marin-invalid-device
 	$(CXX) -std=c++20 -O2 -Wall -Wextra -Iinclude -Iinclude/marin -DGPU tests/marin_invalid_device_test.cpp -o tests/build-marin-invalid-device/marin-invalid-device-test -lOpenCL
