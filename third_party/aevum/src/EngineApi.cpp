@@ -17,6 +17,7 @@ Licensed under GNU GPL version 3. See LICENSE and UPSTREAM.md.
 #include "TuneEntry.h"
 #include "RuntimeAutotune.h"
 #include "PrpUseTune.h"
+#include "InPlaceDefault.h"
 #include "common.h"
 #include "gpuid.h"
 #include "version.h"
@@ -1384,7 +1385,8 @@ public:
       std::ostringstream flags;
       flags << "radix1k=" << (aevumRadix8For1K() ? 8 : 4)
             << ";multiq=" << multi_q_default
-            << ";safe=1;clean=1";
+            << ";safe=1;clean=1"
+            << defaultInPlaceKeyTag(isNvidiaGpu(selected_device));
       if (workload_ == aevum_autotune::Workload::Prp)
         flags << ";shape-confirm=prp-square-v1";
       if (const char* ll = std::getenv("AEVUM_FUSED_LL")) flags << ";fusedll=" << ll;
@@ -1730,7 +1732,8 @@ if (workload_ == aevum_autotune::Workload::Prp && !fft.isPfa()) {
   const auto identity = aevum_autotune::makeKey(
       VERSION, device_vendor, device_name, device_driver, device_runtime,
       workload_, register_count_, exponent_,
-      "safe=1;clean=1;ordinal="+std::to_string(device)+";backend=cuda");
+      "safe=1;clean=1;ordinal="+std::to_string(device)+";backend=cuda"+
+          defaultInPlaceKeyTag(isNvidiaGpu(selected_device)));
   auto profile = selectCudaZeroHack(
       exponent_, register_count_, shared_, fft, identity, pfa_use,
       explicit_zerohack_w_use, verbose);
@@ -1748,7 +1751,8 @@ if (workload_ == aevum_autotune::Workload::Prp && !fft.isPfa()) {
     if (workload_ == aevum_autotune::Workload::Prp && !fft.isPfa()) {
       const auto identity = aevum_autotune::makeKey(VERSION, device_vendor, device_name, device_driver, device_runtime,
           workload_, register_count_, exponent_, "safe=1;clean=1;ordinal="+std::to_string(device)+
-              ";opencl-c="+openclDeviceInfoString(selected_device,CL_DEVICE_OPENCL_C_VERSION));
+              ";opencl-c="+openclDeviceInfoString(selected_device,CL_DEVICE_OPENCL_C_VERSION)+
+              defaultInPlaceKeyTag(isNvidiaGpu(selected_device)));
       auto profile = selectPrpUse(exponent_, register_count_, shared_, fft, identity,
           autotune_cache_hit ? 0 : autotune_elapsed_ms, autotune_runtime_ran, pfa_use, verbose);
       for (const auto& kv : profile) {
